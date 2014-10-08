@@ -1,0 +1,13 @@
+{
+    "name": "corneltek/curlkit",
+    "description": "Curl Kit",
+    "version": "1.0.0",
+    "license": "MIT",
+    "require": { "php": ">=5.3.0" },
+    "require-dev": { "corneltek/phpunit-testmore": "dev-master" },
+    "autoload": {
+        "psr-4": {
+            "CurlKit\\": "src/CurlKit/"
+        }
+    }
+}
