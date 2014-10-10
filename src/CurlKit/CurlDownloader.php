@@ -40,7 +40,7 @@ class CurlDownloader
 
     public $connectionTimeout = 10;
 
-    public $timeout = 60 * 60 * 10;
+    public $timeout = 36000;
 
     public $progress;
 
