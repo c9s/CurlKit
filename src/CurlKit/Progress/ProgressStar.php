@@ -10,9 +10,6 @@ class ProgressStar
     public $url;
     public $done = false;
 
-    /* minimum size to render this progress bar */
-    public $showSize = 10240;
-
     public function prettySize($bytes)
     {
         if ($bytes > 1000000) {
@@ -27,7 +24,7 @@ class ProgressStar
     public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded)
     {
         /* 4kb */
-        if ($downloadSize < $this->showSize || $this->done) {
+        if ($this->done) {
             return;
         }
 
