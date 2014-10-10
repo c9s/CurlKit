@@ -2,6 +2,8 @@
 namespace CurlKit;
 use ArrayAccess;
 use Exception;
+use CurlKit\CurlException;
+
 
 define('CRLF', "\r\n");
 

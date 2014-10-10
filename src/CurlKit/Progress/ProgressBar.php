@@ -9,13 +9,11 @@ class ProgressBar
 
     public $done = false;
 
-    public $showSize = 10240;
-
     public $terminalWidth = 78;
 
-    public function curlCallback($downloadSize, $downloaded, $uploadSize, $uploaded)
+    public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded)
     {
-        if ( $downloadSize < $this->showSize || $this->done ) {
+        if ($this->done) {
             return;
         }
 
@@ -27,7 +25,7 @@ class ProgressBar
         echo "\r" . 
             str_repeat( '#' , $sharps ) . 
             str_repeat( ' ' , $this->terminalWidth - $sharps ) . 
-            sprintf( ' %4d B %5d%%' , $downloaded , $percent * 100 );
+            sprintf( ' %4d B %5d%%' , $downloaded , $percentage * 100 );
 
         if ( $downloadSize != 0 && $downloadSize === $downloaded ) {
             $this->done = true;

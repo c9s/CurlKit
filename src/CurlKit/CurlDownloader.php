@@ -1,6 +1,7 @@
 <?php
 namespace CurlKit;
 use CurlKit\Progress\CurlProgressInterface;
+use CurlKit\CurlException;
 
 /**
  * $downloader = new CurlKit/CurlDownloader;
@@ -43,7 +44,7 @@ class CurlDownloader
 
     public function __construct($options = array() )
     {
-        if( isset($options['progress']) ) {
+        if (isset($options['progress'])) {
             $this->setProgressHandler($options['progress']);
         }
     }
@@ -89,7 +90,7 @@ class CurlDownloader
         $this->options[ CURLOPT_NOPROGRESS ] = false;
 
         // Setup progress handler
-        $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($handler,'curlCallback');
+        $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($this->progress,'curlCallback');
     }
 
     public function getProgressHandler()
@@ -107,7 +108,7 @@ class CurlDownloader
         $options[ CURLOPT_URL ] = $url;
         $ch = $this->createCurlResource( $options );
         if( ! $result = curl_exec($ch)) { 
-            throw new Exception( $url . ":" . curl_error($ch) );
+            throw new CurlException($ch, $url . ":" . curl_error($ch) );
         }
         curl_close($ch); 
         return $result;

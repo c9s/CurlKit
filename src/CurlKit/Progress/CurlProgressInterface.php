@@ -2,7 +2,7 @@
 namespace CurlKit\Progress;
 
 interface CurlProgressInterface {
-    public function curlCallback($downloadSize, $downloaded, $uploadSize, $uploaded);
+    public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded);
 }
 
 

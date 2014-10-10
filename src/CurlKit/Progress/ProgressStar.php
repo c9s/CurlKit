@@ -24,7 +24,7 @@ class ProgressStar
         return round($bytes,2) . 'B';
     }
 
-    public function curlCallback($downloadSize, $downloaded, $uploadSize, $uploaded)
+    public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded)
     {
         /* 4kb */
         if ($downloadSize < $this->showSize || $this->done) {
