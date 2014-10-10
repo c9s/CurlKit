@@ -2,6 +2,7 @@
 namespace CurlKit\Progress;
 use Exception;
 use CurlKit\Progress\CurlProgressInterface;
+use CLIFramework\Formatter;
 
 class ProgressBar
     implements CurlProgressInterface
@@ -11,6 +12,12 @@ class ProgressBar
 
     public $terminalWidth = 78;
 
+    public $formatter;
+
+    public function __construct() {
+        $this->formatter = new Formatter;
+    }
+
     public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded)
     {
         if ($this->done) {
@@ -18,23 +25,32 @@ class ProgressBar
         }
 
         $unit = 'B';
-        if ($downloadSize > 1024) {
+        if ($downloadSize > 1024 * 1024 ) {
+            $unit = 'MB';
+            $downloadSize /= (1024 * 1024.0);
+            $downloaded /= (1024 * 1024.0);
+        } elseif ($downloadSize > 1024) {
             $unit = 'KB';
-            $downloadSize /= 1024;
-            $downloaded /= 1024;
+            $downloadSize /= 1024.0;
+            $downloaded /= 1024.0;
         }
 
+        $barSize = $this->terminalWidth - 12;
+
         // print progress bar
-        $percentage = ($downloaded > 0 ? (float) ($downloaded / $downloadSize) : 0.0 );
-        $sharps = ceil(($this->terminalWidth - 15) * $percentage);
+        $percentage = ($downloaded > 0 ? round($downloaded / $downloadSize, 2) : 0.0 );
+        $sharps = ceil($barSize * $percentage);
 
         # echo "\n" . $sharps. "\n";
-        echo "\r" . 
-            str_repeat( '#' , $sharps ) . 
-            str_repeat( ' ' , $this->terminalWidth - $sharps ) . 
-            sprintf( ' %4d/%4d %s %3d%%', $downloaded, $downloadSize, $unit, $percentage * 100 );
+        echo "\r"
+            . $this->formatter->format('[','strong_white')
+            . str_repeat( '=' , $sharps )
+            . str_repeat( ' ' , $barSize - $sharps )
+            . $this->formatter->format(']','strong_white')
+            . sprintf( ' %.2f/%.2f%s %2d%%', $downloaded, $downloadSize, $unit, $percentage * 100 )
+            ;
 
-        if ( $downloadSize != 0 && $downloadSize === $downloaded ) {
+        if ($downloadSize === $downloaded && $downloadSize > 0) {
             $this->done = true;
             echo "\n";
         }
