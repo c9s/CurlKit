@@ -1,37 +1,35 @@
 <?php
 namespace CurlKit\Progress;
 use Exception;
-use CurlKit\Progress\ProgressInterface;
+use CurlKit\Progress\CurlProgressInterface;
 
 class ProgressBar
-    implements ProgressInterface
+    implements CurlProgressInterface
 {
 
     public $done = false;
+
     public $showSize = 10240;
 
-    function callback($downloadSize, $downloaded, $uploadSize, $uploaded)
-    {
-        if( $downloadSize < $this->showSize ) {
-            return;
-        }
+    public $terminalWidth = 78;
 
-        if( $this->done ) {
+    public function curlCallback($downloadSize, $downloaded, $uploadSize, $uploaded)
+    {
+        if ( $downloadSize < $this->showSize || $this->done ) {
             return;
         }
 
         // print progress bar
-        $percent = ($downloaded > 0 ? (float) ($downloaded / $downloadSize) : 0.0 );
-        $terminalWidth = 70;
-        $sharps = (int) $terminalWidth * $percent;
+        $percentage = ($downloaded > 0 ? (float) ($downloaded / $downloadSize) : 0.0 );
+        $sharps = ceil($this->terminalWidth * $percentage);
 
         # echo "\n" . $sharps. "\n";
         echo "\r" . 
             str_repeat( '#' , $sharps ) . 
-            str_repeat( ' ' , $terminalWidth - $sharps ) . 
+            str_repeat( ' ' , $this->terminalWidth - $sharps ) . 
             sprintf( ' %4d B %5d%%' , $downloaded , $percent * 100 );
 
-        if( $downloadSize != 0 && $downloadSize === $downloaded ) {
+        if ( $downloadSize != 0 && $downloadSize === $downloaded ) {
             $this->done = true;
             echo "\n";
         }

@@ -25,6 +25,7 @@ class CurlAgentTest extends PHPUnit_Framework_TestCase
     }
 
     public function testingProxy() {
+        skip('skip proxy testing');
         $agent = new CurlKit\CurlAgent;
         $agent->setProxy('106.187.96.49:3128');
         $response = $agent->get('https://stackoverflow.com/questions/11297320/using-a-try-catch-with-curl-in-php');

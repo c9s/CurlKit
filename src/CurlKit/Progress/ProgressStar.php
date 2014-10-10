@@ -1,9 +1,9 @@
 <?php
 namespace CurlKit\Progress;
-use CurlKit\Progress\ProgressInterface;
+use CurlKit\Progress\CurlProgressInterface;
 
 class ProgressStar
-    implements ProgressInterface
+    implements CurlProgressInterface
 {
     public $stars = array('-','\\','|','/');
     public $i = 0;
@@ -15,28 +15,24 @@ class ProgressStar
 
     public function prettySize($bytes)
     {
-        if( $bytes > 1000000 ) {
-            return (int)( $bytes / 1000000 ) . 'M';
+        if ($bytes > 1000000) {
+            return round( $bytes / 1000000, 2) . 'M';
         }
-        elseif( $bytes > 1000 ) {
-            return (int)( $bytes / 1000 ) . 'K';
+        elseif ($bytes > 1000) {
+            return round($bytes / 1000, 2) . 'K';
         }
-        return (int) ($bytes) . 'B';
+        return round($bytes,2) . 'B';
     }
 
-    public function callback($downloadSize, $downloaded, $uploadSize, $uploaded)
+    public function curlCallback($downloadSize, $downloaded, $uploadSize, $uploaded)
     {
         /* 4kb */
-        if( $downloadSize < $this->showSize ) {
-            return;
-        }
-        if( $this->done ) {
+        if ($downloadSize < $this->showSize || $this->done) {
             return;
         }
 
         // printf("%s % 4d%%", $s , $percent );
-
-        if( $downloadSize != 0 && $downloadSize === $downloaded ) {
+        if ($downloadSize != 0 && $downloadSize === $downloaded) {
             $this->done = true;
             printf("\r\t%-60s                           \n",$this->url);
         } else {

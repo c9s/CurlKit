@@ -1,5 +1,6 @@
 <?php
 namespace CurlKit;
+use CurlKit\Progress\CurlProgressInterface;
 
 /**
  * $downloader = new CurlKit/CurlDownloader;
@@ -43,7 +44,7 @@ class CurlDownloader
     public function __construct($options = array() )
     {
         if( isset($options['progress']) ) {
-            $this->setProgressHandler( $options['progress'] );
+            $this->setProgressHandler($options['progress']);
         }
     }
 
@@ -82,17 +83,18 @@ class CurlDownloader
      *
      * @param $callback
      */
-    public function setProgressHandler( $handler ) 
+    public function setProgressHandler(CurlProgressInterface $handler)
     {
         $this->progress = $handler;
         $this->options[ CURLOPT_NOPROGRESS ] = false;
-        $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($handler,'callback');
+
+        // Setup progress handler
+        $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($handler,'curlCallback');
     }
 
     public function getProgressHandler()
     {
-        if( isset($this->options[ CURLOPT_PROGRESSFUNCTION ]) )
-            return $this->options[ CURLOPT_PROGRESSFUNCTION ];
+        return $this->progress;
     }
 
     public function fetch($url)
