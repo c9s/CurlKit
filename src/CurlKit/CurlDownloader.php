@@ -27,18 +27,20 @@ class CurlDownloader
 {
 
     public $options = array( 
-        CURLOPT_HEADER => 0, 
+        CURLOPT_HEADER => 1,
         CURLOPT_RETURNTRANSFER => 1, 
-        CURLOPT_FORBID_REUSE => 1, 
-        CURLOPT_BUFFERSIZE => 64,
+        CURLOPT_FORBID_REUSE => 1,
+        CURLOPT_BUFFERSIZE => 128,
         CURLOPT_NOPROGRESS => true,
+        CURLOPT_FAILONERROR => 1,
     );
 
     public $refreshConnect = 1;
     public $followLocation = 1;
 
     public $connectionTimeout = 10;
-    public $timeout = 30;
+
+    public $timeout = 60 * 60 * 10;
 
     public $progress;
 
@@ -56,7 +58,7 @@ class CurlDownloader
             $this->options 
                 + array( 
                     CURLOPT_FRESH_CONNECT => $this->refreshConnect,
-                    CURLOPT_FOLLOWLOCATION => $this->followLocation,
+                    // CURLOPT_FOLLOWLOCATION => $this->followLocation,
 
                     // connection timeout
                     CURLOPT_CONNECTTIMEOUT => $this->connectionTimeout,
@@ -105,13 +107,58 @@ class CurlDownloader
 
     public function request($url, $params = array() , $options = array() ) 
     {
+        if ($this->progress) {
+            $this->progress->done = false;
+        }
         $options[ CURLOPT_URL ] = $url;
-        $ch = $this->createCurlResource( $options );
-        if( ! $result = curl_exec($ch)) { 
+        $ch = $this->createCurlResource($options);
+        $data = curl_exec($ch);
+        if (!$data) {
             throw new CurlException($ch, $url . ":" . curl_error($ch) );
         }
+
+        // We don't enable CURLOPT_FOLLOWLOCATION because
+        // the progress bar does not work after the 1st redirect..
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        list($headers, $body) = explode("\r\n\r\n", $data, 2);
+        if ($code == 301 || $code == 302) {
+            if (preg_match('/Location:\s*(\S+)/', $headers, $matches)) {
+                $newurl = trim(array_pop($matches));
+                curl_close($ch);
+                echo "\nRedirecting to $newurl\n";
+                return $this->request($newurl, $params, $options);
+            } else {
+                throw new CurlException($ch, "The Location header can not be found: " . $headers);
+            }
+        }
         curl_close($ch); 
-        return $result;
+        return $body;
+    }
+
+
+    public function redirectExec($ch, &$redirects, $curlopt_header = false) {
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $data = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if ($http_code == 301 || $http_code == 302) {
+            list($header) = explode("\r\n\r\n", $data, 2);
+            $matches = array();
+            preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
+            $url = trim(array_pop($matches));
+            $url_parsed = parse_url($url);
+            if (isset($url_parsed)) {
+                $ch = $this->createCurlResource(array( CURLOPT_URL => $url));
+                $redirects++;
+                return $this->redirectExec($ch, $redirects);
+            }
+        }
+        if ($curlopt_header) {
+            return $data;
+        } else {
+            list($headers,$body) = explode("\r\n\r\n", $data, 2);
+            return $body;
+        }
     }
 
     // curl_setopt($s,CURLOPT_MAXREDIRS,$this->_maxRedirects); 
