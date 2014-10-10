@@ -44,8 +44,8 @@ class ProgressBar
         # echo "\n" . $sharps. "\n";
         echo "\r"
             . $this->formatter->format('[','strong_white')
-            . str_repeat( '=' , $sharps )
-            . str_repeat( ' ' , $barSize - $sharps )
+            . str_repeat('=', $sharps - 1)
+            . str_repeat(' ', $barSize - $sharps )
             . $this->formatter->format(']','strong_white')
             . sprintf( ' %.2f/%.2f%s %2d%%', $downloaded, $downloadSize, $unit, $percentage * 100 )
             ;
