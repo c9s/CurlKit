@@ -102,7 +102,7 @@ class CurlRequest
         return curl_exec($this->curlResource);
     }
 
-    protected function _encodeFields(& $fields) {
+    protected function _encodeFields(array & $fields) {
         $fieldsString = '';
         foreach( $fields as $key => $value ) { 
             $fieldsString .= $key.'='. urlencode($value) .'&'; 
