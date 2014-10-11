@@ -3,6 +3,8 @@ namespace CurlKit;
 use ArrayAccess;
 use Exception;
 use CurlKit\CurlException;
+use CurlKit\CurlRequest;
+use CurlKit\CurlResponse;
 
 
 define('CRLF', "\r\n");
@@ -29,6 +31,8 @@ class CurlAgent implements ArrayAccess {
 
     public $connectionTimeout = 30;
 
+    public $timeout = 0;
+
     public $failOnError = true;
 
     protected $_curlOptions = array();
@@ -49,11 +53,13 @@ class CurlAgent implements ArrayAccess {
         }
     }
 
+    public function setTimeout($secs) {
+        $this->timeout = $secs;
+    }
+
     public function setConnectionTimeout($secs) {
         $this->connectionTimeout = $secs;
     }
-
-
 
     protected function _handleCurlError($ch) {
         if ( $this->throwException ) {
@@ -106,6 +112,9 @@ class CurlAgent implements ArrayAccess {
         if ($this->connectionTimeout)  {
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connectionTimeout );
         }
+        if ($this->timeout) {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        }
 
         curl_setopt($ch, CURLINFO_HEADER_OUT, true );
 
@@ -131,8 +140,8 @@ class CurlAgent implements ArrayAccess {
         return $ch;
     }
 
-    protected function _readResponseBody($response) {
-        return explode( CRLF . CRLF, $response);
+    protected function _readResponseBody($responseBody) {
+        return explode( CRLF . CRLF, $responseBody);
     }
 
     protected function _separateResponse($ch, $rawResponse) {
@@ -165,7 +174,7 @@ class CurlAgent implements ArrayAccess {
     }
 
 
-    public function sendRequest($request) {
+    public function sendRequest(CurlRequest $request) {
         $rawResponse = $request->send();
         $response = $this->_handleCurlResponse($request->curlResource, $rawResponse);
         $request->setResponse($response);

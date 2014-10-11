@@ -19,6 +19,10 @@ class CurlResponse {
         }
     }
 
+    /**
+     * Create response object from the raw response 
+     *  The raw response includes HTTP header and body
+     */
     public static function createFromRawResponse($ch, $rawResponse) {
         $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $rawHeader  = substr($rawResponse, 0, $headerSize);
