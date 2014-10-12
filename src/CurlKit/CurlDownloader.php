@@ -100,7 +100,19 @@ class CurlDownloader
         $this->options[ CURLOPT_NOPROGRESS ] = false;
 
         // Setup progress handler
-        $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($this->progress,'curlCallback');
+        if (version_compare(phpversion(),"5.5.0") >= 0) {
+            $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($this,'updateProgress5');
+        } else {
+            $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($this,'updateProgress4');
+        }
+    }
+
+    public function updateProgress4($downloaded, $totalDownload, $upload, $totalUpload) {
+        $this->progress->curlCallback(NULL, $downloaded, $totalDownload, $upload, $totalUpload);
+    }
+
+    public function updateProgress5($ch, $downloaded, $totalDownload, $upload, $totalUpload) {
+        $this->progress->curlCallback($ch, $downloaded, $totalDownload, $upload, $totalUpload);
     }
 
     public function getProgressHandler()
