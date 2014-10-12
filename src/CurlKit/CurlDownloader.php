@@ -125,7 +125,7 @@ class CurlDownloader
             if (preg_match('/Location:\s*(\S+)/', $headers, $matches)) {
                 $newurl = trim(array_pop($matches));
                 curl_close($ch);
-                echo "\nRedirecting to $newurl\n";
+                echo "Redirecting to $newurl\n";
                 return $this->request($newurl, $params, $options);
             } else {
                 throw new CurlException($ch, "The Location header can not be found: " . $headers);
