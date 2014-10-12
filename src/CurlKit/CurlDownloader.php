@@ -30,13 +30,15 @@ class CurlDownloader
         CURLOPT_HEADER => 1,
         CURLOPT_RETURNTRANSFER => 1, 
         CURLOPT_FORBID_REUSE => 1,
-        CURLOPT_BUFFERSIZE => 128,
         CURLOPT_NOPROGRESS => true,
         CURLOPT_FAILONERROR => 1,
     );
 
     public $refreshConnect = 1;
+
     public $followLocation = 1;
+
+    public $bufferSize = 512;
 
     public $connectionTimeout = 10;
 
@@ -60,6 +62,8 @@ class CurlDownloader
                     CURLOPT_FRESH_CONNECT => $this->refreshConnect,
                     // CURLOPT_FOLLOWLOCATION => $this->followLocation,
 
+                    CURLOPT_BUFFERSIZE => $this->bufferSize,
+
                     // connection timeout
                     CURLOPT_CONNECTTIMEOUT => $this->connectionTimeout,
 
@@ -69,6 +73,10 @@ class CurlDownloader
                 + $extra
         )); 
         return $ch;
+    }
+
+    public function setBufferSize($bytes) {
+        $this->bufferSize = $bytes;
     }
 
     public function setTimeout($seconds)
