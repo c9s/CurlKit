@@ -21,6 +21,14 @@ class ProgressStar
         return round($bytes,2) . 'B';
     }
 
+    public function reset() {
+        $this->done = false;
+    }
+
+    public function setUrl($url) {
+        $this->url = $url;
+    }
+
     public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded)
     {
         /* 4kb */

@@ -18,6 +18,10 @@ class ProgressBar
         $this->formatter = new Formatter;
     }
 
+    public function reset() {
+        $this->done = false;
+    }
+
     /**
      * 5.5.0 Added the cURL resource as the first argument to the CURLOPT_PROGRESSFUNCTION callback.
      */
@@ -41,7 +45,7 @@ class ProgressBar
         $barSize = $this->terminalWidth - 12;
 
         // print progress bar
-        $percentage = ($downloaded > 0 && $downloadSize > 0 ? round($downloaded / $downloadSize, 2) : 0.0 );
+        $percentage = ($downloaded > 0 && $downloadSize > 0 ? round($downloaded / $downloadSize, 2) : 0.0);
         $sharps = ceil($barSize * $percentage);
 
         # echo "\n" . $sharps. "\n";
