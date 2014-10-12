@@ -27,10 +27,9 @@ class ProgressBar
      */
     public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded)
     {
-        if ($this->done) {
+        if ($this->done || $downloadSize == 0) {
             return;
         }
-
         $unit = 'B';
         if ($downloadSize > 1024 * 1024 ) {
             $unit = 'MB';
@@ -43,8 +42,6 @@ class ProgressBar
         }
 
         $barSize = $this->terminalWidth - 12;
-
-        // print progress bar
         $percentage = ($downloaded > 0 && $downloadSize > 0 ? round($downloaded / $downloadSize, 2) : 0.0);
         $sharps = ceil($barSize * $percentage);
 
