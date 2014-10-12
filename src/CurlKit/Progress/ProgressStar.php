@@ -32,7 +32,7 @@ class ProgressStar
     public function curlCallback($ch, $downloadSize, $downloaded, $uploadSize, $uploaded)
     {
         /* 4kb */
-        if ($this->done) {
+        if ($this->done || $downloadSize == 0) {
             return;
         }
 

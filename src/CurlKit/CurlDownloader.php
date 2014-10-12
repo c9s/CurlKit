@@ -30,13 +30,15 @@ class CurlDownloader
         CURLOPT_HEADER => 1,
         CURLOPT_RETURNTRANSFER => 1, 
         CURLOPT_FORBID_REUSE => 1,
-        CURLOPT_BUFFERSIZE => 128,
         CURLOPT_NOPROGRESS => true,
         CURLOPT_FAILONERROR => 1,
     );
 
     public $refreshConnect = 1;
+
     public $followLocation = 1;
+
+    public $bufferSize = 512;
 
     public $connectionTimeout = 10;
 
@@ -60,6 +62,8 @@ class CurlDownloader
                     CURLOPT_FRESH_CONNECT => $this->refreshConnect,
                     // CURLOPT_FOLLOWLOCATION => $this->followLocation,
 
+                    CURLOPT_BUFFERSIZE => $this->bufferSize,
+
                     // connection timeout
                     CURLOPT_CONNECTTIMEOUT => $this->connectionTimeout,
 
@@ -69,6 +73,10 @@ class CurlDownloader
                 + $extra
         )); 
         return $ch;
+    }
+
+    public function setBufferSize($bytes) {
+        $this->bufferSize = $bytes;
     }
 
     public function setTimeout($seconds)
@@ -92,7 +100,19 @@ class CurlDownloader
         $this->options[ CURLOPT_NOPROGRESS ] = false;
 
         // Setup progress handler
-        $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($this->progress,'curlCallback');
+        if (version_compare(phpversion(),"5.5.0") >= 0) {
+            $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($this,'updateProgress5');
+        } else {
+            $this->options[ CURLOPT_PROGRESSFUNCTION ] = array($this,'updateProgress4');
+        }
+    }
+
+    public function updateProgress4($downloaded, $totalDownload, $upload, $totalUpload) {
+        $this->progress->curlCallback(NULL, $downloaded, $totalDownload, $upload, $totalUpload);
+    }
+
+    public function updateProgress5($ch, $downloaded, $totalDownload, $upload, $totalUpload) {
+        $this->progress->curlCallback($ch, $downloaded, $totalDownload, $upload, $totalUpload);
     }
 
     public function getProgressHandler()
@@ -125,7 +145,7 @@ class CurlDownloader
             if (preg_match('/Location:\s*(\S+)/', $headers, $matches)) {
                 $newurl = trim(array_pop($matches));
                 curl_close($ch);
-                echo "\nRedirecting to $newurl\n";
+                echo "Redirecting to $newurl\n";
                 return $this->request($newurl, $params, $options);
             } else {
                 throw new CurlException($ch, "The Location header can not be found: " . $headers);
