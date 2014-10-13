@@ -45,18 +45,17 @@ class ProgressBar
         $percentage = ($downloaded > 0 && $downloadSize > 0 ? round($downloaded / $downloadSize, 2) : 0.0);
         $sharps = ceil($barSize * $percentage);
 
-        # echo "\n" . $sharps. "\n";
-        echo "\r"
+        fwrite(STDOUT,"\r"
             . $this->formatter->format('[','strong_white')
             . str_repeat('=', $sharps)
             . str_repeat(' ', $barSize - $sharps )
             . $this->formatter->format(']','strong_white')
             . sprintf( ' %.2f/%.2f%s %2d%%', $downloaded, $downloadSize, $unit, $percentage * 100 )
-            ;
+            );
 
         if ($downloadSize === $downloaded && $downloadSize > 0) {
             $this->done = true;
-            echo "\n";
+            fwrite(STDOUT,"\n");
         }
     }
 }
