@@ -46,6 +46,10 @@ class CurlDownloader
 
     public $progress;
 
+    public $proxy;
+
+    public $proxyAuth;
+
     public function __construct($options = array() )
     {
         if (isset($options['progress'])) {
@@ -72,6 +76,14 @@ class CurlDownloader
                 ) 
                 + $extra
         )); 
+
+        if ($this->proxy) {
+            curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, 1);
+            curl_setopt($ch, CURLOPT_PROXY, $this->proxy);
+            if ( $this->proxyAuth ) {
+                curl_setopt($ch, CURLOPT_PROXYUSERPWD, $this->proxyAuth);
+            }
+        }
         return $ch;
     }
 
@@ -155,6 +167,18 @@ class CurlDownloader
         return $body;
     }
 
+    /**
+     * Set Proxy
+     *
+     * @param string $proxy this parameter is a string in 127.0.0.1:8888 format.
+     */
+    public function setProxy($proxy) {
+        $this->proxy = $proxy;
+    }
+
+    public function setProxyAuth($auth) {
+        $this->proxyAuth = $auth;
+    }
 
     public function redirectExec($ch, &$redirects, $curlopt_header = false) {
         curl_setopt($ch, CURLOPT_HEADER, true);

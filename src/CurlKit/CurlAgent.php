@@ -53,6 +53,10 @@ class CurlAgent implements ArrayAccess {
         }
     }
 
+    public function setProxyAuth($auth) {
+        $this->proxyAuth = $auth;
+    }
+
     public function setTimeout($secs) {
         $this->timeout = $secs;
     }
