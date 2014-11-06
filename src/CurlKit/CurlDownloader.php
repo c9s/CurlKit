@@ -152,7 +152,14 @@ class CurlDownloader
         // We don't enable CURLOPT_FOLLOWLOCATION because
         // the progress bar does not work after the 1st redirect..
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        list($headers, $body) = explode("\r\n\r\n", $data, 2);
+
+        $headers = '';
+        $body = '';
+        if (strpos($data,'HTTP/1.1 200 Connection established') === 0 ) {
+            list($proxyStatus, $headers, $body) = explode("\r\n\r\n", $data, 3);
+        } else {
+            list($headers, $body) = explode("\r\n\r\n", $data, 2);
+        }
         if ($code == 301 || $code == 302) {
             if (preg_match('/Location:\s*(\S+)/', $headers, $matches)) {
                 $newurl = trim(array_pop($matches));
