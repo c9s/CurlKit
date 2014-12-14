@@ -80,6 +80,9 @@ class CurlRequest
             curl_setopt($ch, CURLOPT_URL, $this->url);
             curl_setopt($ch, CURLOPT_POST, $this->getParameterCount());
             curl_setopt($ch, CURLOPT_POSTFIELDS, $this->getEncodedParameters() );
+        } elseif ( $this->method === 'HEAD' ) {
+            curl_setopt($ch, CURLOPT_URL, $this->url);
+            curl_setopt($ch, CURLOPT_NOBODY, true);
         } else {
             curl_setopt($ch, CURLOPT_URL, $this->url);
         }
