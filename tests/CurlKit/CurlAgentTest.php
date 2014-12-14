@@ -24,6 +24,18 @@ class CurlAgentTest extends PHPUnit_Framework_TestCase
         ok(is_array($response->headers));
     }
 
+    public function testHead()
+    {
+        $agent = new CurlKit\CurlAgent;
+        ok($agent);
+
+        $response = $agent->head('http://httpbin.org/');
+        ok($response);
+        is('', $response->body);
+        ok($response->headers);
+        ok(is_array($response->headers));
+    }
+
     public function testingProxy() {
         skip('skip proxy testing');
         $agent = new CurlKit\CurlAgent;
