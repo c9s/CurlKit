@@ -1,7 +1,7 @@
 {
     "name": "corneltek/curlkit",
     "description": "Curl Kit",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "license": "MIT",
     "require": {
         "php": ">=5.3.0"
