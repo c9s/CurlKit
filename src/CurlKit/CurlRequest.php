@@ -57,7 +57,11 @@ class CurlRequest
     }
 
     public function getEncodedParameters() {
-        return http_build_query($this->parameters);
+        if (is_array($this->parameters)) {
+            return http_build_query($this->parameters);
+        }
+        return $this->parameters;
+        // return urlencode($this->parameters);
     }
 
     public function getParameters() {
@@ -67,7 +71,6 @@ class CurlRequest
     public function getParameterCount() {
         return count($this->parameters);
     }
-    
 
     public function applyCurlResource($ch) {
         if ( $this->method == 'GET' ) {
@@ -77,9 +80,10 @@ class CurlRequest
             }
             curl_setopt($ch, CURLOPT_URL, $url);
         } elseif ( $this->method == 'POST' ) {
+            $postBody = $this->getEncodedParameters();
             curl_setopt($ch, CURLOPT_URL, $this->url);
-            curl_setopt($ch, CURLOPT_POST, $this->getParameterCount());
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $this->getEncodedParameters() );
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postBody);
         } elseif ( $this->method === 'HEAD' ) {
             curl_setopt($ch, CURLOPT_URL, $this->url);
             curl_setopt($ch, CURLOPT_NOBODY, true);
@@ -90,8 +94,12 @@ class CurlRequest
         // if header is set
         if ( ! empty($this->headers) ) {
             $headerLines = array();
-            foreach( $this->headers as $key => $value ) {
-                $headerLines[] = $key . ':' . $value;
+            foreach ($this->headers as $key => $value) {
+                if (is_numeric($key)) {
+                    $headerLines[] = $value;
+                } else {
+                    $headerLines[] = $key . ':' . $value;
+                }
             }
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headerLines);
         }

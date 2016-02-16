@@ -166,12 +166,12 @@ class CurlAgent implements ArrayAccess {
         return $this->sendRequest($request);
     }
 
-    public function post($url, $fields = array() , $headers = array() ) {
+    public function post($url, $fields = array() , $headers = array()) {
         $ch = $this->_createCurlInstance();
         $request = new CurlRequest($url, 'POST', $fields, $headers);
         $request->applyCurlResource($ch);
         if ( getenv('DEBUG_REQUEST') ) {
-            echo "REQUEST:\n";
+            echo "REQUEST: $url\n";
             print_r($fields);
         }
         return $this->sendRequest($request);
