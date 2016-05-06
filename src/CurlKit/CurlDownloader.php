@@ -25,6 +25,7 @@ use Exception;
 
 class CurlDownloader 
 {
+    protected $userAgent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.A.B.C Safari/525.13';
 
     public $options = array( 
         CURLOPT_HEADER => 1,
@@ -70,6 +71,9 @@ class CurlDownloader
 
                     // connection timeout
                     CURLOPT_CONNECTTIMEOUT => $this->connectionTimeout,
+
+                    // GitHub https will block this if user agent is not given.
+                    CURLOPT_USERAGENT => $this->userAgent,
 
                     // max function call timeout
                     CURLOPT_TIMEOUT => $this->timeout,
@@ -137,7 +141,7 @@ class CurlDownloader
         return $this->request( $url );
     }
 
-    public function request($url, $params = array() , $options = array() ) 
+    public function request($url, $params = array(), $options = array() ) 
     {
         if ($this->progress) {
             $this->progress->done = false;
