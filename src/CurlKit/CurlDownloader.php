@@ -1,7 +1,8 @@
 <?php
+
 namespace CurlKit;
+
 use CurlKit\Progress\CurlProgressInterface;
-use CurlKit\CurlException;
 
 /**
  * $downloader = new CurlKit/CurlDownloader;
@@ -21,7 +22,6 @@ use CurlKit\CurlException;
  *
  * ));
  */
-use Exception;
 
 class CurlDownloader 
 {
@@ -41,9 +41,9 @@ class CurlDownloader
 
     public $bufferSize = 512;
 
-    public $connectionTimeout = 10;
+    public $connectionTimeout;
 
-    public $timeout = 36000;
+    public $timeout;
 
     public $progress;
 
@@ -60,7 +60,16 @@ class CurlDownloader
 
     public function createCurlResource( $extra = array() ) 
     {
-        $ch = curl_init(); 
+        $ch = curl_init();
+
+        if ($this->connectionTimeout !== null) {
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->connectionTimeout);
+        }
+
+        if ($this->timeout !== null) {
+            curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+        }
+
         curl_setopt_array($ch, (
             $this->options 
                 + array( 
@@ -69,14 +78,8 @@ class CurlDownloader
 
                     CURLOPT_BUFFERSIZE => $this->bufferSize,
 
-                    // connection timeout
-                    CURLOPT_CONNECTTIMEOUT => $this->connectionTimeout,
-
                     // GitHub https will block this if user agent is not given.
                     CURLOPT_USERAGENT => $this->userAgent,
-
-                    // max function call timeout
-                    CURLOPT_TIMEOUT => $this->timeout,
                 ) 
                 + $extra
         )); 
