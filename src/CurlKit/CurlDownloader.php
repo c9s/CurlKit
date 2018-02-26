@@ -165,7 +165,7 @@ class CurlDownloader
 
         // When using HTTP TUNNEL, there is an extra response line before the 
         // original response line, we need to separate them if it matches "Connection established"
-        if (preg_match('#HTTP/1.[0-1] 200 Connection established#i', $data)) {
+        if (preg_match('#HTTP/1.[0-1] 200#i', $data)) {
             list($proxyResponseLine, $headers, $body) = explode("\r\n\r\n", $data, 3);
         } else {
             list($headers, $body) = explode("\r\n\r\n", $data, 2);
