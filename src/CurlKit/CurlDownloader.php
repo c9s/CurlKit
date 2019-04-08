@@ -171,7 +171,7 @@ class CurlDownloader
             list($headers, $body) = explode("\r\n\r\n", $data, 2);
         }
         if ($code == 301 || $code == 302) {
-            if (preg_match('/Location:\s*(\S+)/', $headers, $matches)) {
+            if (preg_match('/Location:\s*(\S+)/i', $headers, $matches)) {
                 $newurl = trim(array_pop($matches));
                 curl_close($ch);
                 echo "Redirecting to $newurl\n";
@@ -205,7 +205,7 @@ class CurlDownloader
         if ($http_code == 301 || $http_code == 302) {
             list($header) = explode("\r\n\r\n", $data, 2);
             $matches = array();
-            preg_match('/(Location:|URI:)(.*?)\n/', $header, $matches);
+            preg_match('/(Location:|URI:)(.*?)\n/i', $header, $matches);
             $url = trim(array_pop($matches));
             $url_parsed = parse_url($url);
             if (isset($url_parsed)) {
