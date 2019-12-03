@@ -163,10 +163,13 @@ class CurlDownloader
         $headers = '';
         $body = '';
 
-        // When using HTTP TUNNEL, there is an extra response line before the 
-        // original response line, we need to separate them if it matches "Connection established"
-        if (preg_match('#HTTP/1.[0-1] 200#i', $data)) {
-            list($proxyResponseLine, $headers, $body) = explode("\r\n\r\n", $data, 3);
+        // When using an HTTP TUNNEL, any 2xx (Successful) response indicates that the sender (and all inbound proxies)
+        // will switch to tunnel mode immediately after the blank line that concludes the successful response's header
+        // section; data received after that blank line is from the server identified by the request-target.
+        //
+        // @see https://greenbytes.de/tech/webdav/draft-ietf-httpbis-p2-semantics-26.html#CONNECT
+        if ($this->proxy !== null) {
+            list(, $headers, $body) = explode("\r\n\r\n", $data, 3);
         } else {
             list($headers, $body) = explode("\r\n\r\n", $data, 2);
         }
