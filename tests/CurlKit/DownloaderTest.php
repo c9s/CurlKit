@@ -1,8 +1,9 @@
 <?php
 
 use CurlKit\CurlDownloader;
+use PHPUnit\Framework\TestCase;
 
-class DownloaderTest extends PHPUnit_Framework_TestCase
+class DownloaderTest extends TestCase
 {
     public function testDownloadDefault()
     {
@@ -25,10 +26,10 @@ class DownloaderTest extends PHPUnit_Framework_TestCase
 
     private function assertDownload(CurlDownloader $downloader)
     {
-        $response = $downloader->request('https://httpbin.org/get');
+        $response = $downloader->request('https://api.github.com');
 
         $data = json_decode($response, true);
         $this->assertSame(JSON_ERROR_NONE, json_last_error());
-        $this->assertSame('https://httpbin.org/get', $data['url']);
+        $this->assertSame('https://api.github.com/user', $data['current_user_url']);
     }
 }

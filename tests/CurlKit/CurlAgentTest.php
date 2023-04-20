@@ -1,14 +1,14 @@
 <?php
 
-class CurlAgentTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class CurlAgentTest extends TestCase
 {
 
-    /**
-     * @expectedException CurlKit\CurlException
-     */
     public function testError() {
         $agent = new CurlKit\CurlAgent;
         ok($agent);
+        $this->expectException('CurlKit\\CurlException');
         $response = $agent->get('http://does.not.exist');
     }
 
@@ -17,7 +17,7 @@ class CurlAgentTest extends PHPUnit_Framework_TestCase
         $agent = new CurlKit\CurlAgent;
         ok($agent);
 
-        $response = $agent->get('https://stackoverflow.com/questions/11297320/using-a-try-catch-with-curl-in-php');
+        $response = $agent->get('https://github.com');
         ok($response);
         ok($response->body);
         ok($response->headers);
@@ -29,7 +29,7 @@ class CurlAgentTest extends PHPUnit_Framework_TestCase
         $agent = new CurlKit\CurlAgent;
         ok($agent);
 
-        $response = $agent->head('http://httpbin.org/');
+        $response = $agent->head('https://github.com');
         ok($response);
         is('', $response->body);
         ok($response->headers);
@@ -45,7 +45,7 @@ class CurlAgentTest extends PHPUnit_Framework_TestCase
 
         $agent = new CurlKit\CurlAgent;
         $agent->setProxy($proxy);
-        $response = $agent->get('https://stackoverflow.com/questions/11297320/using-a-try-catch-with-curl-in-php');
+        $response = $agent->get('https://github.com');
         ok($response);
         ok($response->body);
         ok($response->headers);
